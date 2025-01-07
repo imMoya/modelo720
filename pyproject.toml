@@ -1,0 +1,21 @@
+[project]
+name = "modelo720"
+version = "0.1.0"
+description = "Libreria para declarar el Modelo 720 a la AEAT"
+readme = "README.md"
+requires-python = ">=3.9, <3.13"
+dependencies = [
+    "polars>=1.19.0",
+]
+
+[tool.ruff]
+line-length = 79
+
+[tool.ruff.lint]
+extend-select = [
+  "UP",  # pyupgrade
+  "D",   # pydocstyle
+]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
