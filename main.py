@@ -12,7 +12,7 @@ def main():
 
 if __name__ == "__main__":
     #main()
-    print(DegiroGlobal("datasets/Portfolio2023.csv").data)
+    print(DegiroGlobal("datasets/Portfolio2023.csv").generate_financial_record())
 
 
     
