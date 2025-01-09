@@ -50,7 +50,7 @@ class DegiroReader:
                     if sample.is_empty():
                         continue
                         
-                    if sample.map_elements(try_float).sum() > 0:
+                    if sample.map_elements(try_float, return_dtype=pl.Float64).sum() > 0:
                         df = df.with_columns([
                             pl.col(col)
                             .str.replace(',', '.')
