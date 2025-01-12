@@ -1,6 +1,6 @@
 """Main program."""
-from modelo720 import DegiroReader, IbkrReader
-from modelo720 import DegiroGlobal
+from modelo720.degiro import DegiroReader
+from modelo720.model.compute import FileConfig, GlobalCompute
 
 def main():
     """Main program."""
@@ -12,5 +12,8 @@ def main():
 
 if __name__ == "__main__":
     #main()
-    print(DegiroGlobal("datasets/Portfolio2023.csv").generate_financial_record())
-    print(IbkrReader("datasets/Portfolio2023_IBKR.csv", 2023).data)
+    #print(DegiroGlobal("datasets/Portfolio2023.csv").generate_financial_record())
+    #print(DegiroReader("datasets/Portfolio2023.csv").data)
+    #print(IbkrReader("datasets/Portfolio2023_IBKR.csv", 2023).data)
+    my_file = FileConfig("datasets/Portfolio2023.csv", "degiro", True)
+    print(GlobalCompute(my_file).generate_financial_record())

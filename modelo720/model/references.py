@@ -4,6 +4,16 @@ DEGIRO = {
     "country": "NL",
     "columns": ["product", "isin", "amount", "eur_value"],
 }
+IBKR = {
+    "name": "IBKR",
+    "country": "IE",
+    "columns": ["product", "isin", "amount", "eur_value"],
+}
+
+BROKER_MAP = {
+    "degiro": DEGIRO,
+    "ibkr": IBKR
+}
 
 GLOBAL_INFO = {
     "year": "2024",

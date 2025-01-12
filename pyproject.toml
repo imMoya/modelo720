@@ -8,6 +8,7 @@ dependencies = [
     "currencyconverter>=0.18.2",
     "pandas>=2.2.3",
     "polars>=1.19.0",
+    "pydantic>=2.10.5",
 ]
 
 [tool.ruff]

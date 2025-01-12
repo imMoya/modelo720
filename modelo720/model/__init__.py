@@ -1,4 +1,4 @@
 """init file."""
-from .utils import DegiroGlobal
+from modelo720.model.compute import FileConfig, GlobalCompute
 
-__all__ = ["DegiroGlobal"]
+__all__ = ["FileConfig", "GlobalCompute"]
