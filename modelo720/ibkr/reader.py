@@ -22,14 +22,11 @@ class IbkrReader:
         """Performs data transformations."""
         self._data = self.read_dataset()
         self._data = self._data.rename(COLUMNS_DICT).select(list(COLUMNS_DICT.values()))
-        #TODO: create a method to build "eur_value" column
         last_trading_day = last_trading_day_of_year(self.year)
-        print("LTD", last_trading_day)
         self._data = self._data.with_columns(
             pl.struct(["local_value", "local_currency"]).map_elements(lambda x: convert_to_eur_historical(x["local_value"], x["local_currency"], last_trading_day), return_dtype=float)
             .alias("eur_value")
         )
-        #self._data = self.convert_num_columns(self._data)
         return self._data
 
  
