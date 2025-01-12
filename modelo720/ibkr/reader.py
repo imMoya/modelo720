@@ -24,7 +24,7 @@ class IbkrReader:
         self._data = self._data.rename(COLUMNS_DICT).select(list(COLUMNS_DICT.values()))
         last_trading_day = last_trading_day_of_year(self.year)
         self._data = self._data.with_columns(
-            pl.struct(["local_value", "local_currency"]).map_elements(lambda x: convert_to_eur_historical(x["local_value"], x["local_currency"], last_trading_day), return_dtype=float)
+            pl.struct(["local_value", "local_curr"]).map_elements(lambda x: convert_to_eur_historical(x["local_value"], x["local_curr"], last_trading_day), return_dtype=float)
             .alias("eur_value")
         )
         return self._data

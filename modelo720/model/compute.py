@@ -16,6 +16,7 @@ class FileConfig:
     file_path: Union[str, Path]
     broker: Literal['ibkr', 'degiro']
     presented: bool
+    year: int
 
 
 class GlobalCompute:
@@ -46,7 +47,7 @@ class GlobalCompute:
         if broker == "degiro":
             reader = DegiroReader(file_path)
         elif broker == "ibkr":
-            reader = IbkrReader(file_path)
+            reader = IbkrReader(file_path, 2023)
         else:
             raise ValueError(f"Unsupported broker type: {broker}")
 

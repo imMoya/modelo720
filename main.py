@@ -15,5 +15,5 @@ if __name__ == "__main__":
     #print(DegiroGlobal("datasets/Portfolio2023.csv").generate_financial_record())
     #print(DegiroReader("datasets/Portfolio2023.csv").data)
     #print(IbkrReader("datasets/Portfolio2023_IBKR.csv", 2023).data)
-    my_file = FileConfig("datasets/Portfolio2023.csv", "degiro", True)
+    my_file = FileConfig("datasets/Portfolio2023.csv", "degiro", True, 2023)
     print(GlobalCompute(my_file).generate_financial_record())

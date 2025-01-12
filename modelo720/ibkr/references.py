@@ -4,5 +4,5 @@ COLUMNS_DICT = {
     "ISIN": "isin",
     "Quantity": "amount",
     "PositionValue": "local_value",
-    "CurrencyPrimary": "local_currency"
+    "CurrencyPrimary": "local_curr"
 }
