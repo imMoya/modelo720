@@ -6,7 +6,7 @@ readme = "README.md"
 requires-python = ">=3.9, <3.13"
 dependencies = [
     "currencyconverter>=0.18.2",
-    "numpy>=2.0.2",
+    "pandas>=2.2.3",
     "polars>=1.19.0",
 ]
 

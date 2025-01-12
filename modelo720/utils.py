@@ -1,5 +1,5 @@
 """utils module."""
-import numpy as np
+import pandas as pd
 from currency_converter import CurrencyConverter
 from datetime import datetime
 from typing import Optional
@@ -19,13 +19,23 @@ def convert_to_eur_historical(amount: float, currency: str, date: str) -> Option
     Raises:
         ValueError: If the currency is not supported or the date format is incorrect.
     """
-    try:
-        # Initialize the currency converter
-        curr_conv = CurrencyConverter()
-        historical_date = datetime.strptime(date, "%Y-%m-%d")
-        return curr_conv.convert(amount, currency, 'EUR', historical_date)
-    except Exception:
-        return np.nan
+    # Initialize the currency converter
+    curr_conv = CurrencyConverter()
+    return curr_conv.convert(amount, currency, 'EUR', date)
+
+
+def last_trading_day_of_year(year: int) -> datetime:
+    """
+    Returns the last trading day of a given year.
+
+    Args:
+        year (int): The year for which to find the last trading day.
+
+    Returns:
+        datetime: The last trading day of the year.
+    """
+    date_range = pd.date_range(start=f'{year}-01-01', end=f'{year}-12-31', freq='B')
+    return date_range[-1]
 
 
 def try_float(s: str) -> bool:

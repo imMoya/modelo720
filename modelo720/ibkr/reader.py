@@ -2,19 +2,20 @@
 import polars as pl
 from pathlib import Path
 from typing import Union
-from modelo720.utils import try_float, convert_to_eur_historical
+from modelo720.utils import try_float, convert_to_eur_historical, last_trading_day_of_year
 from .references import COLUMNS_DICT
 
 
 class IbkrReader:
     """Reads the IBKR portfolio CSV file."""
-    def __init__(self, file_path: Union[str, Path]):
+    def __init__(self, file_path: Union[str, Path], year: int):
         """Initializes class to read CSV.
 
         Args:
             file_path (Union[str, Path]): file path of the portfolio
         """
         self.file_path = Path(file_path)
+        self.year = year
 
     @property
     def data(self):
@@ -22,8 +23,10 @@ class IbkrReader:
         self._data = self.read_dataset()
         self._data = self._data.rename(COLUMNS_DICT).select(list(COLUMNS_DICT.values()))
         #TODO: create a method to build "eur_value" column
+        last_trading_day = last_trading_day_of_year(self.year)
+        print("LTD", last_trading_day)
         self._data = self._data.with_columns(
-            pl.struct(["local_value", "local_currency"]).map_elements(lambda x: convert_to_eur_historical(x["local_value"], x["local_currency"], "2023-12-31"), return_dtype=float)
+            pl.struct(["local_value", "local_currency"]).map_elements(lambda x: convert_to_eur_historical(x["local_value"], x["local_currency"], last_trading_day), return_dtype=float)
             .alias("eur_value")
         )
         #self._data = self.convert_num_columns(self._data)

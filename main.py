@@ -13,5 +13,10 @@ def main():
 if __name__ == "__main__":
     #main()
     print(DegiroGlobal("datasets/Portfolio2023.csv").generate_financial_record())
-    print(IbkrReader("datasets/Portfolio2023_IBKR.csv").data)
+    print(IbkrReader("datasets/Portfolio2023_IBKR.csv", 2023).data)
    
+    from currency_converter import CurrencyConverter
+    from datetime import datetime
+    curr_conv = CurrencyConverter()
+    historical_date = datetime.strptime("2023-12-29", "%Y-%m-%d")
+    print(curr_conv.convert(100, 'USD', 'EUR', historical_date))
