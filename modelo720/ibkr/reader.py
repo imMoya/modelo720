@@ -1,13 +1,13 @@
-"""degiro reader for modelo720."""
+"""ibkr reader for modelo720."""
 import polars as pl
 from pathlib import Path
 from typing import Union
-from modelo720.utils import try_float
+from modelo720.utils import try_float, convert_to_eur_historical
 from .references import COLUMNS_DICT
 
 
-class DegiroReader:
-    """Reads the Degiro portfolio CSV file."""
+class IbkrReader:
+    """Reads the IBKR portfolio CSV file."""
     def __init__(self, file_path: Union[str, Path]):
         """Initializes class to read CSV.
 
@@ -20,12 +20,16 @@ class DegiroReader:
     def data(self):
         """Performs data transformations."""
         self._data = self.read_dataset()
-        self._data = self._data.rename(COLUMNS_DICT)
-        self._data = self.split_local_value(self._data)
-        self._data = self.convert_num_columns(self._data)
+        self._data = self._data.rename(COLUMNS_DICT).select(list(COLUMNS_DICT.values()))
+        #TODO: create a method to build "eur_value" column
+        self._data = self._data.with_columns(
+            pl.struct(["local_value", "local_currency"]).map_elements(lambda x: convert_to_eur_historical(x["local_value"], x["local_currency"], "2023-12-31"), return_dtype=float)
+            .alias("eur_value")
+        )
+        #self._data = self.convert_num_columns(self._data)
         return self._data
 
-
+ 
     def read_dataset(self):
         """Reads the file."""
         data = pl.read_csv(self.file_path)
@@ -61,21 +65,3 @@ class DegiroReader:
                     continue
         
         return df
-
-
-    @staticmethod
-    def split_local_value(df: pl.DataFrame, col_name: str = "local_value") -> pl.DataFrame:
-        """Split local value into currency and value.
-
-        Args:
-            df (pl.DataFrame): polars dataframe
-            col_name (str, optional): column name. Defaults to "local_value".
-
-        Returns:
-            pl.DataFrame: reformatted polars dataframe with split columns
-        """
-        return df.with_columns(
-            pl.col(col_name).str.extract_groups(r"(\w+)\s+([\d,\.]+)")
-            .struct.rename_fields(["local_curr", "local_val"]).alias(col_name),
-        ).unnest(col_name)
-    

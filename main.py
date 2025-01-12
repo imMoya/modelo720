@@ -1,5 +1,5 @@
 """Main program."""
-from modelo720 import DegiroReader
+from modelo720 import DegiroReader, IbkrReader
 from modelo720 import DegiroGlobal
 
 def main():
@@ -13,6 +13,5 @@ def main():
 if __name__ == "__main__":
     #main()
     print(DegiroGlobal("datasets/Portfolio2023.csv").generate_financial_record())
-
-
-    
+    print(IbkrReader("datasets/Portfolio2023_IBKR.csv").data)
+   

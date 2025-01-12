@@ -5,6 +5,8 @@ description = "Libreria para declarar el Modelo 720 a la AEAT"
 readme = "README.md"
 requires-python = ">=3.9, <3.13"
 dependencies = [
+    "currencyconverter>=0.18.2",
+    "numpy>=2.0.2",
     "polars>=1.19.0",
 ]
 
