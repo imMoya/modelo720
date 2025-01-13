@@ -17,3 +17,5 @@ if __name__ == "__main__":
     #print(IbkrReader("datasets/Portfolio2023_IBKR.csv", 2023).data)
     my_file = FileConfig("datasets/Portfolio2023.csv", "degiro", True, 2023)
     print(GlobalCompute(my_file).generate_financial_record())
+    my_file = FileConfig("datasets/Portfolio2023_IBKR.csv", "ibkr", True, 2023)
+    print(GlobalCompute(my_file).financial_record)

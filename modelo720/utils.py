@@ -5,8 +5,7 @@ from datetime import datetime
 from typing import Optional
 
 def convert_to_eur_historical(amount: float, currency: str, date: str) -> Optional[float]:
-    """
-    Converts an amount from a given currency to EUR using historical exchange rates.
+    """Converts an amount from a given currency to EUR using historical exchange rates.
 
     Args:
         amount (float): The amount of money in the original currency.
@@ -25,8 +24,7 @@ def convert_to_eur_historical(amount: float, currency: str, date: str) -> Option
 
 
 def last_trading_day_of_year(year: int) -> datetime:
-    """
-    Returns the last trading day of a given year.
+    """Returns the last trading day of a given year.
 
     Args:
         year (int): The year for which to find the last trading day.

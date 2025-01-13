@@ -178,3 +178,6 @@ logs/
 
 # DS_Store
 .DS_Store
+
+# hidden tests
+tests_hidden

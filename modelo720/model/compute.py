@@ -67,6 +67,10 @@ class GlobalCompute:
         self._data = self.remove_null_values(self._data, "isin")
         self._data = self.add_broker_code(self._data, self.config.broker)
         return self._data
+    
+    @property
+    def financial_record(self) -> str:
+        return "\n".join(self.generate_financial_record())
 
     @staticmethod
     def remove_null_values(df: pl.DataFrame, col_filter: str) -> pl.DataFrame:
@@ -164,7 +168,7 @@ class GlobalCompute:
             output.append(transaction_sub1)
             output.append(transaction_sub2)
 
-        return "\n".join(output)
+        return output
 
     @staticmethod
     def get_count(df: pl.DataFrame) -> int:
