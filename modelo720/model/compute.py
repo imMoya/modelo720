@@ -28,19 +28,22 @@ class FileConfig:
 class GlobalCompute:
     """Main class to transform data into global model."""
 
-    def __init__(self, config: FileConfig):
+    def __init__(self, configs: list[FileConfig]):
         """Initializes the class with the configuration.
 
         Args:
-            config (FileConfig): Configuration object containing broker details.
+            config (list[FileConfig]): List of configuration objects containing broker details.
         self.df = self._load_data(file_path, broker)
         """
-        self.config = config
-        self.broker_info = BROKER_MAP[config.broker]
-        self.df = self._load_data()
+        self.config = configs
+        self.dataframes = [self._load_data(config) for config in configs]
+        self.concat_data = self._concat_data()
 
-    def _load_data(self) -> pl.DataFrame:
+    def _load_data(self, config: FileConfig) -> pl.DataFrame:
         """Loads data based on the broker type specified in the configuration.
+
+        Args:
+            config (FileConfig): Configuration object containing broker details.
 
         Returns:
             pl.DataFrame: Loaded data as a Polars DataFrame.
@@ -48,8 +51,8 @@ class GlobalCompute:
         Raises:
             ValueError: If the broker type is invalid.
         """
-        broker = self.config.broker
-        file_path = self.config.file_path
+        broker = config.broker
+        file_path = config.file_path
 
         if broker == "degiro":
             reader = DegiroReader(file_path)
@@ -58,22 +61,29 @@ class GlobalCompute:
         else:
             raise ValueError(f"Unsupported broker type: {broker}")
 
-        logger.info(f"Loaded data for broker: {broker} | Presented: {self.config.presented}")
-        return reader.data
+        logger.info(f"Loaded data for broker: {broker} | Presented: {config.presented}")
+        df = reader.data.select(BROKER_MAP[broker]["columns"])
+        df = self.remove_null_values(df, "isin")
+        df = self.add_broker_code(df, config.broker)
+        print(df)
+        return df
+
+    def _concat_data(self) -> pl.DataFrame:
+        """Concatenates all dataframes.
+
+        Returns:
+            pl.DataFrame: Concatenated dataframe.
+        """
+        return pl.concat(self.dataframes)
 
     @property
     def data(self) -> pl.DataFrame:
-        """Returns the global data property.
+        """Returns the concatenated data property.
 
         Returns:
-            pl.DataFrame: global dataframe
+            pl.DataFrame: Concatenated dataframe.
         """
-        # Select broker-specific columns
-        self._data = self.df.select(self.broker_info["columns"])
-        # Process data: remove null values and add broker code
-        self._data = self.remove_null_values(self._data, "isin")
-        self._data = self.add_broker_code(self._data, self.config.broker)
-        return self._data
+        return self.concat_data
 
     @property
     def financial_record(self) -> str:
@@ -123,7 +133,7 @@ class GlobalCompute:
 
         data = self.data
         declared_values = self.get_count(data)
-        total_amount = self.data["eur_value"].sum()
+        total_amount = data["eur_value"].sum()
 
         # Generate header record (17 record)
         header = (

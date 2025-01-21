@@ -45,8 +45,12 @@ class DegiroReader:
             pl.DataFrame: reformatted dataframe with numeric columns
         """
         for col in df.columns:
-            if df[col].dtype in [pl.Float64, pl.Int64]:
+            if df[col].dtype == pl.Float64:
                 continue
+
+            if df[col].dtype == pl.Int64:
+                df = df.with_columns(pl.col(col).cast(pl.Float64).alias(col))
+
             else:
                 try:
                     sample = df[col].drop_nulls().head(10)
