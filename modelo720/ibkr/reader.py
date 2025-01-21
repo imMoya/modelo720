@@ -1,14 +1,22 @@
 """ibkr reader for modelo720."""
-import polars as pl
+
 from pathlib import Path
-from typing import Union
-from modelo720.utils import try_float, convert_to_eur_historical, last_trading_day_of_year
+
+import polars as pl
+
+from modelo720.utils import (
+    convert_to_eur_historical,
+    last_trading_day_of_year,
+    try_float,
+)
+
 from .references import COLUMNS_DICT
 
 
 class IbkrReader:
     """Reads the IBKR portfolio CSV file."""
-    def __init__(self, file_path: Union[str, Path], year: int):
+
+    def __init__(self, file_path: str | Path, year: int):
         """Initializes class to read CSV.
 
         Args:
@@ -24,17 +32,20 @@ class IbkrReader:
         self._data = self._data.rename(COLUMNS_DICT).select(list(COLUMNS_DICT.values()))
         last_trading_day = last_trading_day_of_year(self.year)
         self._data = self._data.with_columns(
-            pl.struct(["local_value", "local_curr"]).map_elements(lambda x: convert_to_eur_historical(x["local_value"], x["local_curr"], last_trading_day), return_dtype=float)
+            pl.struct(["local_value", "local_curr"])
+            .map_elements(
+                lambda x: convert_to_eur_historical(x["local_value"], x["local_curr"], last_trading_day),
+                return_dtype=float,
+            )
             .alias("eur_value")
         )
         return self._data
 
- 
     def read_dataset(self):
         """Reads the file."""
         data = pl.read_csv(self.file_path)
         return data
-    
+
     @staticmethod
     def convert_num_columns(df: pl.DataFrame) -> pl.DataFrame:
         """Convert columns to numeric.
@@ -53,15 +64,10 @@ class IbkrReader:
                     sample = df[col].drop_nulls().head(10)
                     if sample.is_empty():
                         continue
-                        
+
                     if sample.map_elements(try_float, return_dtype=pl.Float64).sum() > 0:
-                        df = df.with_columns([
-                            pl.col(col)
-                            .str.replace(',', '.')
-                            .cast(pl.Float64)
-                            .alias(col)
-                        ])
+                        df = df.with_columns([pl.col(col).str.replace(",", ".").cast(pl.Float64).alias(col)])
                 except Exception:
                     continue
-        
+
         return df

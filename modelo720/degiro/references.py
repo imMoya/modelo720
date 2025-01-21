@@ -1,4 +1,5 @@
 """degiro references."""
+
 COLUMNS_DICT = {
     "Producto": "product",
     "Symbol/ISIN": "isin",

@@ -1,4 +1,5 @@
 """references for the model."""
+
 DEGIRO = {
     "name": "DEGIRO",
     "country": "NL",
@@ -10,10 +11,7 @@ IBKR = {
     "columns": ["product", "isin", "amount", "eur_value"],
 }
 
-BROKER_MAP = {
-    "degiro": DEGIRO,
-    "ibkr": IBKR
-}
+BROKER_MAP = {"degiro": DEGIRO, "ibkr": IBKR}
 
 GLOBAL_INFO = {
     "year": "2024",
