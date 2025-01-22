@@ -5,4 +5,4 @@ lint:
 	uv run ruff check --fix modelo720
 
 test:
-	uv run pytest tests
+	uv run pytest tests_hidden
