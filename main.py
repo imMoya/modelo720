@@ -17,8 +17,16 @@ if __name__ == "__main__":
     #print(IbkrReader("datasets/Portfolio2023_IBKR.csv", 2023).data)
     #my_file = FileConfig("datasets/Portfolio2023.csv", "degiro", True, 2023)
     #print(GlobalCompute(my_file).generate_financial_record())
+    length_to_match = len("1720202400000000T<SURNAME1 SURNAME2> <NAME>              T676767676<SURNAME1 SURNAME2> <NAME>              7200000000000")
     files_2023 = [
         FileConfig("datasets/Portfolio2023_IBKR.csv", "ibkr", True, 2023),
         FileConfig("datasets/Portfolio2023.csv", "degiro", True, 2023)
     ]
-    print(GlobalCompute(files_2023).generate_financial_record())
+    files_2024 = [
+        FileConfig("datasets/Portfolio2024_IBKR.csv", "ibkr", True, 2023),
+        FileConfig("datasets/Portfolio2024.csv", "degiro", True, 2023)
+    ]
+    a = GlobalCompute(configs=files_2024, prev_configs=files_2023)
+    print(a.old_dataframes)
+    print(a.dataframes)
+    

@@ -1,7 +1,7 @@
 """module to build the global model from degiro data."""
 
 from pathlib import Path
-from typing import Literal
+from typing import Literal, Optional
 
 import polars as pl
 from pydantic.dataclasses import dataclass
@@ -28,7 +28,7 @@ class FileConfig:
 class GlobalCompute:
     """Main class to transform data into global model."""
 
-    def __init__(self, configs: list[FileConfig]):
+    def __init__(self, configs: list[FileConfig], prev_configs: Optional[list[FileConfig]] = None):
         """Initializes the class with the configuration.
 
         Args:
@@ -37,7 +37,8 @@ class GlobalCompute:
         """
         self.config = configs
         self.dataframes = [self._load_data(config) for config in configs]
-        self.concat_data = self._concat_data()
+        self.old_dataframes = [self._load_data(config) for config in prev_configs] if prev_configs else []
+        #self.concat_data = self._concat_data()
 
     def _load_data(self, config: FileConfig) -> pl.DataFrame:
         """Loads data based on the broker type specified in the configuration.
@@ -68,13 +69,17 @@ class GlobalCompute:
         print(df)
         return df
 
-    def _concat_data(self) -> pl.DataFrame:
-        """Concatenates all dataframes.
+    @staticmethod
+    def _concat_data(dataframes_list = list[pl.DataFrame]) -> pl.DataFrame:
+        """Concatenates a list of Polars DataFrames into a single DataFrame.
+
+        Args:
+            dataframes_list (list[pl.DataFrame]): A list of Polars DataFrames to concatenate.
 
         Returns:
-            pl.DataFrame: Concatenated dataframe.
+            pl.DataFrame: A single concatenated Polars DataFrame.
         """
-        return pl.concat(self.dataframes)
+        return pl.concat(dataframes_list)
 
     @property
     def data(self) -> pl.DataFrame:
@@ -83,7 +88,16 @@ class GlobalCompute:
         Returns:
             pl.DataFrame: Concatenated dataframe.
         """
-        return self.concat_data
+        return self.concat_data(self.dataframes)
+    
+    @property
+    def old_data(self) -> pl.DataFrame:
+        """Returns the concatenated old data property.
+
+        Returns:
+            pl.DataFrame: Concatenated dataframe.
+        """
+        return self.concat_data(self.old_dataframes) 
 
     @property
     def financial_record(self) -> str:
@@ -153,7 +167,7 @@ class GlobalCompute:
         )
         output.append(header)
 
-        # Generate transaction records (27 records)
+        # Generate transaction records (27 record)
         for row in data.to_dicts():
             transaction_sub1 = (
                 f"2720"
