@@ -79,7 +79,8 @@ class GlobalCompute:
         Returns:
             pl.DataFrame: A single concatenated Polars DataFrame.
         """
-        return pl.concat(dataframes_list)
+        non_empty_dfs = [df for df in dataframes_list if not df.is_empty()]
+        return pl.concat(non_empty_dfs) if non_empty_dfs else pl.DataFrame()
 
     @property
     def data(self) -> pl.DataFrame:
@@ -88,7 +89,7 @@ class GlobalCompute:
         Returns:
             pl.DataFrame: Concatenated dataframe.
         """
-        return self.concat_data(self.dataframes)
+        return self._concat_data(self.dataframes)
     
     @property
     def old_data(self) -> pl.DataFrame:
@@ -97,7 +98,7 @@ class GlobalCompute:
         Returns:
             pl.DataFrame: Concatenated dataframe.
         """
-        return self.concat_data(self.old_dataframes) 
+        return self._concat_data(self.old_dataframes) 
 
     @property
     def financial_record(self) -> str:
@@ -212,3 +213,57 @@ class GlobalCompute:
             int: count of the dataframe
         """
         return len(df)
+    
+    def generate_financial_record_with_previous(self) -> str:
+        output = []
+        prev_transactions = []
+
+        old_data = self.old_data
+        old_data_products = old_data["product"].to_list()
+        # TODO: check if the product is in the new data
+        data = self.data
+        data_products = data["product"].to_list()
+
+        declared_values = self.get_count(data)
+
+        for product in old_data_products:
+            if product in data_products:
+                row = old_data.filter(pl.col("product") == product).to_dicts()[0]
+                declared_values += 1
+                transaction_sub1 = (
+                    f"2720"
+                    f"{GLOBAL_INFO['year']}"
+                    f"{GLOBAL_INFO['dni_number']}"
+                    f"{GLOBAL_INFO['dni_number']}"
+                    f"{' ' * 9}"
+                    f"{f'{GLOBAL_INFO["surnames"]} {GLOBAL_INFO["name"]}'.ljust(40)}"
+                    "1"
+                    f"{' ' * 25}"
+                    "V1"
+                    f"{' ' * 25}"
+                    f"{row['broker_country_id']}"
+                    "1"
+                    f"{row['isin']}"
+                    f"{' ' * 46}"
+                    f"{row['product']:40}"
+                )
+                transaction_sub2 = (
+                    f"{row['isin'][:2]}"
+                    f"{0:08}A{0:08}"
+                    " "
+                    f"{int(row['eur_value'] * 100):014}"
+                    " "
+                    f"{0:014}C{int(row['amount'] * 100):012}"
+                    " "
+                    f"{int(100 * 100):05}"
+                )
+                output.append(transaction_sub1)
+                output.append(transaction_sub2)
+            else:
+                pass 
+
+        print(output)
+
+    def transaction_append(row: dict, option: str = "A") -> list:
+        # TODO: create method to append financial transactions
+        pass
