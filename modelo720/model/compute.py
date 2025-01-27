@@ -33,7 +33,6 @@ class GlobalCompute:
 
         Args:
             config (list[FileConfig]): List of configuration objects containing broker details.
-        self.df = self._load_data(file_path, broker)
         """
         self.config = configs
         self.dataframes = [self._load_data(config) for config in configs]
@@ -53,20 +52,18 @@ class GlobalCompute:
             ValueError: If the broker type is invalid.
         """
         broker = config.broker
-        file_path = config.file_path
 
         if broker == "degiro":
-            reader = DegiroReader(file_path)
+            reader = DegiroReader(config.file_path)
         elif broker == "ibkr":
-            reader = IbkrReader(file_path, 2023)
+            reader = IbkrReader(config.file_path, config.year)
         else:
             raise ValueError(f"Unsupported broker type: {broker}")
 
         logger.info(f"Loaded data for broker: {broker} | Presented: {config.presented}")
         df = reader.data.select(BROKER_MAP[broker]["columns"])
         df = self.remove_null_values(df, "isin")
-        df = self.add_broker_code(df, config.broker)
-        print(df)
+        df = self.add_broker_code(df, broker)
         return df
 
     @staticmethod
@@ -155,7 +152,7 @@ class GlobalCompute:
 
         # Generate transaction records (27 record)
         for row in data.to_dicts():
-            transaction_sub1, transaction_sub2 = self.transaction_record(row, "A")
+            transaction_sub1, transaction_sub2 = self.get_transaction_record(row, "A")
             output.append(transaction_sub1)
             output.append(transaction_sub2)
 
