@@ -62,8 +62,8 @@ class GlobalCompute:
 
         logger.info(f"Loaded data for broker: {broker} | Presented: {config.presented}")
         df = reader.data.select(BROKER_MAP[broker]["columns"])
-        df = self.remove_null_values(df, "isin")
         df = self.add_broker_code(df, broker)
+        df = self.remove_null_values(df, "isin", broker)
         return df
 
     @staticmethod
@@ -102,7 +102,7 @@ class GlobalCompute:
         return "\n".join(self.generate_financial_record())
 
     @staticmethod
-    def remove_null_values(df: pl.DataFrame, col_filter: str) -> pl.DataFrame:
+    def remove_null_values(df: pl.DataFrame, col_filter: str, broker: Literal["ibkr", "degiro"]) -> pl.DataFrame:
         """Removes null values from the dataframe.
 
         Args:
@@ -113,8 +113,9 @@ class GlobalCompute:
             pl.DataFrame: dataframe without null values
         """
         deleted_df = df.filter(pl.col(col_filter).is_null())
-        logger.info(f"Removing the following values: {deleted_df}")
-        logger.info("The above values will not be included in the model")
+        if not deleted_df.is_empty():
+            deleted_broker_product = deleted_df.select(["product"]).to_series().to_list()
+            logger.info(f"Deleted products from {broker}: {deleted_broker_product} ")
         return df.filter(pl.col(col_filter).is_not_null())
 
     @staticmethod
