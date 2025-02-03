@@ -61,7 +61,7 @@ class GlobalCompute:
             raise ValueError(f"Unsupported broker type: {broker}")
 
         logger.info(f"Loaded data for broker: {broker} | Presented: {config.presented}")
-        df = reader.data.select(BROKER_MAP[broker]["columns"])
+        df = reader.data.select(BROKER_MAP[broker].columns)
         df = self.add_broker_code(df, broker)
         df = self.remove_null_values(df, "isin", broker)
         return df
@@ -129,7 +129,7 @@ class GlobalCompute:
         Returns:
             pl.DataFrame: Modified dataframe with broker_country_id column.
         """
-        broker_map = {broker: info["country"] for broker, info in BROKER_MAP.items()}
+        broker_map = {broker: info.country for broker, info in BROKER_MAP.items()}
 
         if broker not in broker_map:
             raise ValueError(f"Invalid broker reference '{broker}'. Must be 'degiro' or 'ibkr'.")
@@ -224,11 +224,11 @@ class GlobalCompute:
         assert option in ["A", "M", "C"], "Option must be 'A', 'M', or 'C'"
         transaction_sub1 = (
             f"2720"
-            f"{GLOBAL_INFO['year']}"
-            f"{GLOBAL_INFO['dni_number']}"
-            f"{GLOBAL_INFO['dni_number']}"
+            f"{GLOBAL_INFO.year}"
+            f"{GLOBAL_INFO.dni_number}"
+            f"{GLOBAL_INFO.dni_number}"
             f"{' ' * 9}"
-            f"{f'{GLOBAL_INFO["surnames"]} {GLOBAL_INFO["name"]}'.ljust(40)}"
+            f"{f'{GLOBAL_INFO.surnames} {GLOBAL_INFO.name}'.ljust(40)}"
             "1"
             f"{' ' * 25}"
             "V1"
@@ -255,11 +255,11 @@ class GlobalCompute:
     def get_header(declared_values: int, total_amount: float) -> str:
         header = (
             f"1720"
-            f"{GLOBAL_INFO['year']}"
-            f"{GLOBAL_INFO['dni_number']}"
-            f"{f'{GLOBAL_INFO["surnames"]} {GLOBAL_INFO["name"]}'.ljust(40)}"
-            f"T{GLOBAL_INFO['telephone']}"
-            f"{f'{GLOBAL_INFO["surnames"]} {GLOBAL_INFO["name"]}'.ljust(40)}"
+            f"{GLOBAL_INFO.year}"
+            f"{GLOBAL_INFO.dni_number}"
+            f"{f'{GLOBAL_INFO.surnames} {GLOBAL_INFO.name}'.ljust(40)}"
+            f"T{GLOBAL_INFO.telephone}"
+            f"{f'{GLOBAL_INFO.surnames} {GLOBAL_INFO.name}'.ljust(40)}"
             f"{7200000000000:013d}"
             f"{' ' * 2}"
             f"{declared_values:022}"

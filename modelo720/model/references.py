@@ -1,23 +1,40 @@
 """references for the model."""
 
-DEGIRO = {
-    "name": "DEGIRO",
-    "country": "NL",
-    "columns": ["product", "isin", "amount", "eur_value"],
-}
-IBKR = {
-    "name": "IBKR",
-    "country": "IE",
-    "columns": ["product", "isin", "amount", "eur_value"],
-}
+from pydantic import BaseModel, Field
+from typing import List, Dict
 
-BROKER_MAP = {"degiro": DEGIRO, "ibkr": IBKR}
+class BrokerInfo(BaseModel):
+    name: str
+    country: str
+    columns: List[str]
 
-GLOBAL_INFO = {
-    "year": "2024",
-    "dni_number": "00000000T",
-    "surnames": "<SURNAME1 SURNAME2>",
-    "name": "<NAME>",
-    "telephone": "676767676",
-    "ownership_percentage": 100,
-}
+class GlobalInfo(BaseModel):
+    year: int
+    dni_number: str
+    surnames: str
+    name: str
+    telephone: str
+    ownership_percentage: float = Field(ge=0, le=100)
+
+DEGIRO = BrokerInfo(
+    name="DEGIRO",
+    country="NL",
+    columns=["product", "isin", "amount", "eur_value"],
+)
+
+IBKR = BrokerInfo(
+    name="IBKR",
+    country="IE",
+    columns=["product", "isin", "amount", "eur_value"],
+)
+
+BROKER_MAP: Dict[str, BrokerInfo] = {"degiro": DEGIRO, "ibkr": IBKR}
+
+GLOBAL_INFO = GlobalInfo(
+    year=2024,
+    dni_number="00000000T",
+    surnames="<SURNAME1 SURNAME2>",
+    name="<NAME>",
+    telephone="676767676",
+    ownership_percentage=100.0,
+)
