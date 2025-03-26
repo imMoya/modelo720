@@ -1,12 +1,13 @@
 """references for the model."""
 
 from pydantic import BaseModel, Field
-from typing import List, Dict
+
 
 class BrokerInfo(BaseModel):
     name: str
     country: str
-    columns: List[str]
+    columns: list[str]
+
 
 class GlobalInfo(BaseModel):
     year: int
@@ -15,6 +16,7 @@ class GlobalInfo(BaseModel):
     name: str
     telephone: str
     ownership_percentage: float = Field(ge=0, le=100)
+
 
 DEGIRO = BrokerInfo(
     name="DEGIRO",
@@ -28,7 +30,7 @@ IBKR = BrokerInfo(
     columns=["product", "isin", "amount", "eur_value"],
 )
 
-BROKER_MAP: Dict[str, BrokerInfo] = {"degiro": DEGIRO, "ibkr": IBKR}
+BROKER_MAP: dict[str, BrokerInfo] = {"degiro": DEGIRO, "ibkr": IBKR}
 
 GLOBAL_INFO = GlobalInfo(
     year=2024,

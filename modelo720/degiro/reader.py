@@ -6,7 +6,7 @@ import polars as pl
 
 from modelo720.utils import try_float
 
-from .references import COLUMNS_DICT
+from .references import COLUMNS_DICT, DESIRED_SCHEMA
 
 
 class DegiroReader:
@@ -24,9 +24,10 @@ class DegiroReader:
     def data(self):
         """Performs data transformations."""
         self._data = self.read_dataset()
-        self._data = self._data.rename(COLUMNS_DICT)
+        self._data = self._data.rename(COLUMNS_DICT).select(list(COLUMNS_DICT.values()))
         self._data = self.split_local_value(self._data)
         self._data = self.convert_num_columns(self._data)
+        self._data = self._data.cast(DESIRED_SCHEMA)
         return self._data
 
     def read_dataset(self):
@@ -78,6 +79,6 @@ class DegiroReader:
         return df.with_columns(
             pl.col(col_name)
             .str.extract_groups(r"(\w+)\s+([\d,\.]+)")
-            .struct.rename_fields(["local_curr", "local_val"])
+            .struct.rename_fields(["local_curr", "local_value"])
             .alias(col_name),
         ).unnest(col_name)

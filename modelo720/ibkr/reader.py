@@ -10,7 +10,7 @@ from modelo720.utils import (
     try_float,
 )
 
-from .references import COLUMNS_DICT
+from .references import COLUMNS_DICT, DESIRED_SCHEMA
 
 
 class IbkrReader:
@@ -39,6 +39,7 @@ class IbkrReader:
             )
             .alias("eur_value")
         )
+        self._data = self._data.cast(DESIRED_SCHEMA)
         return self._data
 
     def read_dataset(self):

@@ -38,7 +38,7 @@ class GlobalCompute:
         self.dataframes = [self._load_data(config) for config in configs]
         self.old_dataframes = [self._load_data(config) for config in prev_configs] if prev_configs else []
         if prev_configs is not None:
-            self.compute_difference()
+            self.data_difference = self.compute_difference()
 
     def _load_data(self, config: FileConfig) -> pl.DataFrame:
         """Loads data based on the broker type specified in the configuration.
@@ -137,7 +137,7 @@ class GlobalCompute:
             raise ValueError(f"Invalid broker reference '{broker}'. Must be 'degiro' or 'ibkr'.")
 
         return df.with_columns(pl.lit(broker_map[broker]).alias("broker_country_id"))
-    
+
     # TODO: Remove options
     @staticmethod
     def remove_options(df: pl.DataFrame) -> pl.DataFrame:
@@ -285,6 +285,29 @@ class GlobalCompute:
             f"{0:017}"
         )
         return header
-    
-    def compute_difference(self):
-        pass
+
+    def compute_difference(self) -> pl.DataFrame:
+        """Computes the difference between current and previous data,
+        assigning an 'order_type' based on presence in each DataFrame.
+
+        - 'A' → product only in current data (self.data)
+        - 'C' → product only in old data (self.old_data)
+        - 'M' → product in both current and old data
+
+        Returns:
+            pl.DataFrame: updated data including the 'order_type' column.
+        """
+        old_products = set(self.old_data.get_column("product").to_list())
+
+        # Assign order type to current data
+        data = self.data.with_columns(
+            pl.col("product").map_elements(lambda product: "M" if product in old_products else "A").alias("order_type")
+        )
+
+        # Get products only in old data (not in current)
+        missing_old_data = self.old_data.filter(~pl.col("product").is_in(data["product"])).with_columns(
+            pl.lit("C").alias("order_type")
+        )
+
+        # Concatenate both
+        return pl.concat([data, missing_old_data], how="vertical")
