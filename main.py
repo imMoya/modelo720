@@ -26,6 +26,6 @@ if __name__ == "__main__":
         FileConfig("datasets/Portfolio2024_IBKR.csv", "ibkr", True, 2023),
         FileConfig("datasets/Portfolio2024.csv", "degiro", True, 2023)
     ]
-    a = GlobalCompute(configs=files_2023)
+    a = GlobalCompute(configs=files_2024, prev_configs=files_2023)
     print(a.generate_financial_record())
     

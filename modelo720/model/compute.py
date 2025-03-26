@@ -37,7 +37,8 @@ class GlobalCompute:
         self.config = configs
         self.dataframes = [self._load_data(config) for config in configs]
         self.old_dataframes = [self._load_data(config) for config in prev_configs] if prev_configs else []
-        # self.concat_data = self._concat_data()
+        if prev_configs is not None:
+            self.compute_difference()
 
     def _load_data(self, config: FileConfig) -> pl.DataFrame:
         """Loads data based on the broker type specified in the configuration.
@@ -63,6 +64,7 @@ class GlobalCompute:
         logger.info(f"Loaded data for broker: {broker} | Presented: {config.presented}")
         df = reader.data.select(BROKER_MAP[broker].columns)
         df = self.add_broker_code(df, broker)
+        df = self.remove_options(df)
         df = self.remove_null_values(df, "isin", broker)
         return df
 
@@ -135,6 +137,20 @@ class GlobalCompute:
             raise ValueError(f"Invalid broker reference '{broker}'. Must be 'degiro' or 'ibkr'.")
 
         return df.with_columns(pl.lit(broker_map[broker]).alias("broker_country_id"))
+    
+    # TODO: Remove options
+    @staticmethod
+    def remove_options(df: pl.DataFrame) -> pl.DataFrame:
+        """Removes the rows which correspond to options contracts
+
+        Args:
+            df (pl.DataFrame): original dataframe
+
+        Returns:
+            pl.DataFrame: filtered dataframe
+        """
+        option_pattern = r"\b[A-Z]{1,6} \d{2}[A-Z]{3}\d{2} \d+(\.\d+)? [CP]\b"
+        return df.filter(~pl.col("product").str.contains(option_pattern))
 
     def generate_financial_record(self) -> str:
         """Generates the financial record for the model 720.
@@ -269,3 +285,6 @@ class GlobalCompute:
             f"{0:017}"
         )
         return header
+    
+    def compute_difference(self):
+        pass
