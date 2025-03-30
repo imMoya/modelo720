@@ -309,5 +309,18 @@ class GlobalCompute:
             pl.lit("C").alias("order_type")
         )
 
+        if missing_old_data.height > 0:
+            # For example, join with `self.lookup_df` on 'product'
+            from modelo720.ibkr import IbkrActivity
+
+            act = IbkrActivity("datasets/Activity2024_IBKR.csv", "r")
+            missing_old_data = missing_old_data.join(
+                act.exit_data.select(["isin", "Proceeds_EUR"]), on="isin", how="left"
+            )
+            # Adds additional column with null values
+            data = data.with_columns([pl.lit(None).cast(pl.Float64).alias("Proceeds_EUR")])
+
         # Concatenate both
-        return pl.concat([data, missing_old_data], how="vertical")
+        df = pl.concat([data, missing_old_data], how="vertical")
+
+        return df

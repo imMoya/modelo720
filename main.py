@@ -26,6 +26,11 @@ if __name__ == "__main__":
         FileConfig("datasets/Portfolio2024_IBKR.csv", "ibkr", True, 2023),
         FileConfig("datasets/Portfolio2024.csv", "degiro", True, 2023)
     ]
+    ###
+    from modelo720 import IbkrActivity
+    #act = IbkrActivity("datasets/Activity2024_IBKR.csv", "r")
+    ##
     a = GlobalCompute(configs=files_2024, prev_configs=files_2023)
-    print(a.generate_financial_record())
+    a.data_difference.write_csv("datasets/modelo720_2024_proceeds.csv")
+    #print(a.generate_financial_record())
     
